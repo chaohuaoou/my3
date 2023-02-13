@@ -1,0 +1,234 @@
+local 攻击速度颜色 = ("2497CA-101010|2188B6-101010|1D769E-101010|29B4F3-101010|26A3DB-101010")
+local 卓越一击率颜色 = ("2497CA-101010|2188B6-101010|1D769E-101010|29B4F3-101010|26A3DB-101010|1B6889-101010")
+local 攻击力颜色 = ("2293C5-101010|2188B6-101010|1D769E-101010|29B4F3-101010|26A3DB-101010|26A1D8-101010|2187B5-101010")
+local 最大生命颜色 = ("2293C5-101010|2188B6-101010|1D769E-101010|29B4F3-101010|26A3DB-101010|26A1D8-101010|175D7C-101010")
+local 伤害反射颜色 = ("2497CB-101010|2083AF-101010|1D7299-101010|27A8E2-101010")
+local 伤害减少颜色=("1E7DA8-101010|218FC0-101010|1E769D-101010|27A7E1-101010|249CD2-101010")
+local 防御成功率颜色=("2497CA-101010|2391C1-101010|1D759D-101010|27A7E1-101010|1F82AE-101010|1B688A")
+
+local jewelry = {"之指环","之项链","之耳环","血色天使","暗黑天使","之翼"}
+local dict_files1 = {"zzh.txt","zxl.txt","zeh.txt","xsts.txt","ahts.txt","zy.txt"}
+local color_fmt1 = {"D223B7-101010|A41C8E-101010|B21E9A-101010","D223B7-101010|A41C8E-101010|B41E9C-101010","D223B7-101010|A41C8E-101010|B41E9C-101010","F26055-101010|C64F46-101010|AE463E-101010","C34D44-101010|DD574D-101010|F26055-101010|9A3D36-101010|AD453D-101010","9D8D34-101010|E6CE4A-101010|A09034-101010|CEB943-101010|BCA83D-101010"}
+local attribute = {"攻击速度","卓越一击率","攻击力","最大生命","伤害反射","伤害减少","防御成功率"}
+local dict_files = {"gjsd.txt", "zyyj.txt", "gongjili.txt", "zdsm.txt", "shfs.txt", "shjs.txt", "fycgl.txt","jys.txt"}
+local color_fmt = {攻击速度颜色,卓越一击率颜色,攻击力颜色,最大生命颜色,伤害反射颜色,伤害减少颜色,防御成功率颜色}
+local x1, y1, x2, y2 = 774, 183, 1120, 576
+local grid_width, grid_height = 40, 40
+
+
+
+function tingliu(time)   --随机停留时间tingliu({500,1000}) tingliu({})
+	local randomTime = math.random(time[1], time[2])
+	sleep(randomTime)
+end
+
+function tap_random(x, y, range_percentage, min_duration, max_duration)  --定义随机点击位置和松开时间-tap_random(坐标, 偏移百分比, ,松开时间) tap_random(28, 26,1,300,400)
+	local gesture = Gesture:new() -- 创建一个手势对象
+	local path = Path:new() -- 创建一条路径
+	-- 计算随机偏移的半径
+	local range = math.floor(range_percentage * 0.01 * math.min(x, y))
+	-- 计算随机的坐标
+	local random_x = math.floor(x + 0.5 + math.random(-range, range))
+	local random_y = math.floor(y + 0.5 + math.random(-range, range))
+	-- 计算随机的按下时间
+	local random_duration = math.floor(min_duration + (max_duration - min_duration) * math.random())
+	-- 添加按下和松开的路径
+	path:setStartTime(0)
+	path:setDurTime(random_duration)
+	path:addPoint(random_x, random_y)
+	gesture:addPath(path)
+	
+	function onFinishEvent(type) -- 回调函数
+	end
+	
+	local r = gesture:dispatch(onFinishEvent)
+	if r then
+		print("点击成功")
+	else
+		print("执行失败")
+	end
+end
+
+function set_dict_files(index, dict_files)  ---设置字库变量
+	setDict(index, dict_files)
+	useDict(index)
+end
+
+function myFindStr()       ---打开交易行判断交易税是否存在，否则再打开一次
+	setDict(0, "s1.txt")
+	useDict(0)
+	local params = {1023,587,1085,612,"交易税","D71F1F-101010|B41A1A-101010|EE2222-101010|911717-101010",0.6}
+	local x, y = -1, -1
+	ret,x,y = findStr(params[1], params[2], params[3], params[4], params[5], params[6], params[7])
+	if x ~= -1 and y ~= -1 then
+		print(ret,x,y)
+		tingliu({1200,1500})
+		return true
+	else
+		while true do
+			ret,x, y = findStr(params[1], params[2], params[3], params[4], params[5], params[6], params[7])
+			if x ~= -1 and y ~= -1 then
+				return true
+			end
+			tingliu({500,600})
+			tap_random(28, 26,1,300,400)
+			tingliu({1300,1800})
+			tap_random(1023,26,1,300,400)
+			tingliu({1300,1800})
+			tap_random(942, 113,1,300,400)
+			tingliu({1300,1800})
+			tap(496,152)
+			tingliu({1200,1500})
+		end
+	end
+end
+
+
+function shibiewenzi()     ---识别交易行中的货架数字
+	setDict(0,"s1.txt")
+	useDict(0)
+	local x, y = -1, -1
+	local ret, x, y = findStr(482,190,505,218,"s0|s1|s2|s3|s4|s5|s6","696A6C-101010|A5A8AB-101010|BBBFC2-101010|D6DADE-101010|8D9092-101010",0.82)
+	if x ~= -1 and y ~= -1 then
+		local num = ret
+		print(num)
+		return num
+	end
+end
+
+function tap_shangjia(x, y)
+	local ret, _x, _y = findPic(769, 188, 972, 538, "sj.png|sj1.png|sj2.png|sj3.png", "101010", 0, 0.8)
+	if ret == 0 then
+		print("找到坐标：".._x, _y)
+		print("已上架")
+		tingliu({300, 400})
+		tap(_x, _y)
+		sleep(2000)
+		return true
+	end
+end
+
+function shangjia(shangjia_success)
+	for i = 1, 2 do
+		local x = -1
+		local y = -1
+		ret, x, y = findPic(769, 188, 972, 538, "sj.png|sj1.png|sj2.png|sj3.png", "101010", 0, 0.8)
+		if x ~= -1 and y ~= -1 then
+			print("找到坐标："..x,y)
+			print("已上架")
+			tingliu({300, 400})
+			if i == 2 then
+				shangjia_success = true
+				return
+			else
+				tap_shangjia(x, y)
+			end
+		end
+	end
+end
+
+function xiajia()  --点下架文字
+	for i = 1, 1 do
+		setDict(0,"xj.txt")
+		useDict(0)
+		local x=-1 y=-1
+		ret,x,y = findStr(771,184,1123,579,"下架","D3D6D8-101010|B7B4AF-101010|AE9A8A-101010|ABA39B-101010|C3C3C3-101010",0.7)
+		if x ~= -1 and y ~= -1 then
+			print("找到坐标："..x,y)
+			tingliu({1300,1800})
+			tap_random(x,y,2,300,400)
+		else
+			print("文字不存在")
+		end
+	end
+	tingliu({1800,2100})
+end
+
+function process_jewelry(i)
+	local shangjia_success = false
+	set_dict_files(i-1, dict_files1[i])
+	local x, y = -1, -1
+	local ret, x, y = findStr(480,162,686,234, jewelry[i], color_fmt1[i], 0.92)
+	if x ~= -1 and y ~= -1 then
+		print(jewelry[i].."这是要找的首饰")
+		tingliu({1500,1800})
+		if jewelry[i] == "之翼" then
+			local color_found, intX, intY = findColor(410,332,611,577,"1A698C|174F67|1C749C|2497CC|164D66|175B79|28AFEC|218CBC|1C759D|2395C8",0,0.9)
+			tingliu({1500,1800})
+			if intX>-1 and intY>-1 then
+				print("找到颜色，坐标为：", intX, intY)
+				tingliu({1300,1600})
+				local success = shangjia()
+				if success then
+					return true
+				end
+			end
+		else
+			local attr_found = false
+			for j=1, #attribute do
+				set_dict_files(j-1, dict_files[j])
+				local x, y = -1, -1
+				local ret, x, y = findStr(413,364,614,622, attribute[j], color_fmt[j], 0.92)
+				if x ~= -1 and y ~= -1 then
+					print(attribute[j].."这是要找的属性")
+					tingliu({1500,2000})
+					tap(770,256)    ---点击
+					tingliu({1500,2000})
+					shangjia(shangjia_success)
+					success = shangjia()
+					if success then
+						return true
+					end
+					return false
+				end
+			end
+			if not attr_found then
+				print("属性不对")
+				tingliu({500,800})
+				tap_random(792, 115,5,300,400)
+			end
+		end
+	end
+	return false
+end
+
+if myFindStr() then
+	local result = shibiewenzi()
+	if result ~= nil then
+		for i = 1, result do
+			tap_random(280,323,2,300,400)
+			tingliu({1200,1600})
+			xiajia()
+		end
+		for i = 1, 8 do
+			for j = 1, 9 do
+				local x = x1 + (j - 1) * grid_width + (grid_width / 2)
+				local y = y1 + (i - 1) * grid_height + (grid_height / 2)
+				tingliu({500,700})
+				tap_random(x, y,1,300,400)      --每个格子点击位置
+				tingliu({1300,1600})
+				for i=1, #jewelry do
+					local isBreak = false
+					local success = process_jewelry(i)
+					if success then
+						break
+					end
+					if isBreak then
+						break
+					end
+				end
+				if not found then
+					print("不是我要找的")
+					tingliu({1000,1300})
+					tap_random(792, 115,5,300,400)
+				end
+				if isBreak then
+					break
+				end
+			end
+			if isBreak then
+				break
+			end
+		end
+	end
+end
